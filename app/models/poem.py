@@ -63,7 +63,7 @@ poem_user = Table(
 )
 
 
-class Poem(db.Model, BaseModel):
+class Poem(BaseModel, db.Model):
     __tablename__ = "poems"
 
     title = Column(String(100), nullable=False)

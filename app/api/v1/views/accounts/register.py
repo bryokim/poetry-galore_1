@@ -1,4 +1,7 @@
+from datetime import timedelta
 from flask import (
+    abort,
+    current_app,
     flash,
     jsonify,
     make_response,
@@ -7,22 +10,22 @@ from flask import (
     render_template,
     url_for,
 )
-from flask_login import login_user
+from flask_login import (
+    login_required,
+    login_user,
+    logout_user,
+    fresh_login_required,
+)
+import requests
 
-from app import db
 from app.models.user import User
+from app.models.engine.db_storage import DBStorage
 from app.forms.register import RegisterForm
 from app.utils.decorators import logout_required
-from app.views import accounts
+from app.api.v1.views import accounts_view
 
 
-@accounts.route("/")
-def hello():
-    users = User.query.all()
-    return make_response(jsonify([user.to_dict() for user in users]))
-
-
-@accounts.route("/register", methods=["GET", "POST"])
+@accounts_view.route("/register", methods=["GET", "POST"])
 @logout_required
 def register():
     form = RegisterForm(request.form)
@@ -32,8 +35,8 @@ def register():
             email=form.email.data,
             password=form.password.data,
         )
-        db.session.add(user)
-        db.session.commit()
+        DBStorage().new(user)
+        DBStorage().save()
 
         # token = generate_token(user.email)
         # confirm_url = url_for(
@@ -45,10 +48,18 @@ def register():
         # subject = "Please confirm your email"
         # send_email(user.email, subject, html)
 
-        login_user(user)
+        login_user(user, duration=timedelta(minutes=1))
         # flash("A confirmation email has been sent via email", "success")
 
         # return redirect(url_for("accounts.inactive"))
-        return redirect(url_for("accounts.login"))
+        return redirect(url_for("accounts_view.login"))
 
     return render_template("accounts/register.html", form=form)
+
+
+@accounts_view.route("/logout")
+@fresh_login_required
+def logout():
+    logout_user()
+    flash("You were logged out.", "success")
+    return redirect(url_for("accounts_view.login"))

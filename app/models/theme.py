@@ -5,7 +5,7 @@ from app.models.base_model import BaseModel
 from app.models.poem import poem_theme
 
 
-class Theme(db.Model, BaseModel):
+class Theme(BaseModel, db.Model):
     __tablename__ = "themes"
 
     name = Column(String(100), nullable=False)

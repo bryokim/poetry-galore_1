@@ -5,7 +5,7 @@ from app.models.base_model import BaseModel
 from app.models.poem import poem_category
 
 
-class Category(db.Model, BaseModel):
+class Category(BaseModel, db.Model):
     __tablename__ = "categories"
 
     name = Column(String(100), nullable=False)

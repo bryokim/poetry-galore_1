@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from flask import (
     flash,
     request,
@@ -11,10 +12,10 @@ from app import bcrypt
 from app.models.user import User
 from app.forms.login import LoginForm
 from app.utils.decorators import logout_required
-from app.views import accounts
+from app.api.v1.views import accounts_view
 
 
-@accounts.route("/login", methods=["GET", "POST"])
+@accounts_view.route("/login", methods=["GET", "POST"])
 @logout_required
 def login():
     form = LoginForm(request.form)
@@ -24,8 +25,8 @@ def login():
         if user and bcrypt.check_password_hash(
             user.password, form.password.data
         ):
-            login_user(user)
-            return redirect(url_for("accounts.hello"))
+            login_user(user, duration=timedelta(minutes=1))
+            return redirect(url_for("accounts_view.home"))
         else:
             flash("Invalid email/password", "danger")
             return render_template("accounts/login.html", form=form)

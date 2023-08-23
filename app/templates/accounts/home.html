@@ -1,0 +1,15 @@
+{% extends '_base.html' %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col">
+        {% if current_user.is_authenticated %}
+            {{ current_user.__dict__ }}
+        {% else %}
+            {{ current_user.__dict__ }}
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

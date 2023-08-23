@@ -4,7 +4,7 @@ from app import db
 from app.models.base_model import BaseModel
 
 
-class Comment(db.Model, BaseModel):
+class Comment(BaseModel, db.Model):
     __tablename__ = "comments"
 
     text = Column(String(1000), nullable=False)
